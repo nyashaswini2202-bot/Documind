@@ -1,0 +1,22 @@
+Northwind Analytics - Remote Work and Leave Policy (Version 3.2)
+
+1. Remote work eligibility
+Full-time employees who have completed their 90-day probation may work remotely up to three days per week. Employees on probation must work from the office five days a week. Managers approve remote schedules, and teams must keep at least two common office days (Tuesday and Thursday) for in-person collaboration.
+
+2. Equipment and stipends
+Northwind provides a laptop and a monitor to every employee. Remote workers receive a one-time home office stipend of 500 US dollars and a monthly internet allowance of 40 US dollars. Receipts for the stipend must be submitted within 60 days of the employee's first remote day. Equipment remains company property and must be returned within 14 days of the last working day.
+
+3. Working hours and availability
+Core collaboration hours are 10:00 to 16:00 in the employee's local time zone. Employees must be reachable on Slack during core hours. Meetings should not be scheduled outside core hours without the consent of all attendees.
+
+4. Annual leave
+Employees receive 24 paid leave days per calendar year, accrued monthly. Up to 8 unused days can be carried over to the next year; any additional unused days expire on 31 March. Leave requests of more than five consecutive days need manager approval at least 30 days in advance.
+
+5. Sick leave and parental leave
+Employees receive 12 paid sick days per year. A medical certificate is required after three consecutive sick days. Primary caregivers receive 20 weeks of fully paid parental leave, and secondary caregivers receive 6 weeks. Parental leave can be taken in one block or split into two blocks within 12 months of the child's birth or adoption.
+
+6. Security requirements for remote work
+All remote work must use the company VPN. Public Wi-Fi may only be used together with the VPN. Employees must enable full-disk encryption and automatic screen lock after five minutes of inactivity. Lost or stolen devices must be reported to the security team within 24 hours.
+
+7. Policy violations
+Repeated violations of the security requirements may lead to revocation of remote work privileges. Disputes are handled by the People Operations team, and employees may appeal decisions within 10 working days.

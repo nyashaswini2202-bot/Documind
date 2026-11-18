@@ -1,0 +1,11 @@
+services:
+  documind:
+    build: .
+    ports:
+      - "7860:7860"
+    env_file:
+      - .env
+    volumes:
+      - documind-data:/home/user/app/data
+volumes:
+  documind-data:

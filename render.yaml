@@ -1,0 +1,16 @@
+# Render Blueprint: New + > Blueprint > pick your GitHub repo.
+# The embedding + reranker models need ~1 GB RAM, so use the "starter" plan or larger
+# (or set USE_RERANKER=false to fit a 512 MB instance).
+services:
+  - type: web
+    name: documind
+    runtime: docker
+    plan: starter
+    healthCheckPath: /api/health
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false
+      - key: USE_RERANKER
+        value: "true"
+      - key: DATA_DIR
+        value: /home/user/app/data

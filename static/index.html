@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DocuMind – Ask your documents</title>
+  <meta name="description" content="Upload documents and get cited answers grounded in their text.">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%232346a8'/%3E%3Crect x='8' y='7' width='16' height='3' rx='1.5' fill='%23fff'/%3E%3Crect x='8' y='13' width='16' height='5' rx='1.5' fill='%23fde58a'/%3E%3Crect x='8' y='21' width='10' height='3' rx='1.5' fill='%23fff'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script>
+    (function () {
+      var saved = localStorage.getItem("documind_theme");
+      var dark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      document.documentElement.setAttribute("data-theme", saved || (dark ? "dark" : "light"));
+    })();
+  </script>
+</head>
+<body>
+<div class="app">
+
+  <header class="topbar">
+    <button id="menuBtn" class="icon-btn menu-btn" aria-label="Open documents panel" aria-expanded="false">
+      <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+    </button>
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="brand-name">DocuMind</span>
+    </div>
+    <div class="topbar-right">
+      <span class="chip" id="llmChip" title="Language model used for answers">LLM: checking…</span>
+      <span class="chip" id="rerankChip" title="Cross-encoder reranking">Reranker: checking…</span>
+      <button id="themeBtn" class="icon-btn" aria-label="Switch colour theme">
+        <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true"><path d="M10 2a8 8 0 1 0 0 16V2z" fill="currentColor"/><circle cx="10" cy="10" r="7.2" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <aside class="sidebar" id="sidebar" aria-label="Documents and settings">
+    <section class="panel">
+      <h2>Documents</h2>
+      <label class="dropzone" id="dropzone" for="fileInput">
+        <input id="fileInput" type="file" multiple accept=".pdf,.txt,.md,.docx" hidden>
+        <strong>Add documents</strong>
+        <span>Drop files here or click to browse</span>
+        <small>PDF, TXT, MD, DOCX · up to <span id="maxMb">15</span> MB each</small>
+      </label>
+      <div id="uploadStatus" class="upload-status" role="status" aria-live="polite"></div>
+      <ul id="docList" class="doc-list" aria-label="Indexed documents"></ul>
+      <p id="docEmpty" class="muted small">No documents yet. Add a file to get started, or try the files in <code>sample_docs/</code>.</p>
+    </section>
+
+    <section class="panel">
+      <h2>Retrieval</h2>
+      <label class="field">
+        <span>Search method</span>
+        <select id="modeSelect">
+          <option value="hybrid_rerank">Hybrid + rerank (best)</option>
+          <option value="hybrid">Hybrid (keywords + meaning)</option>
+          <option value="dense">Meaning only (vectors)</option>
+          <option value="bm25">Keywords only (BM25)</option>
+        </select>
+      </label>
+      <label class="field">
+        <span>Passages used for each answer: <output id="topKOut">5</output></span>
+        <input id="topK" type="range" min="1" max="10" value="5">
+      </label>
+    </section>
+
+    <section class="panel">
+      <h2>Workspace</h2>
+      <p class="muted small">Your documents are private to this browser. Nobody else can see them.</p>
+      <button id="clearBtn" class="btn btn-danger" type="button">Delete all documents</button>
+    </section>
+  </aside>
+  <div class="scrim" id="scrim" hidden></div>
+
+  <main class="main">
+    <div class="tabs" role="tablist" aria-label="Views">
+      <button class="tab active" role="tab" id="tabBtnChat" aria-selected="true" aria-controls="tab-chat" data-tab="chat">Ask</button>
+      <button class="tab" role="tab" id="tabBtnEval" aria-selected="false" aria-controls="tab-eval" data-tab="eval">Evaluate quality</button>
+    </div>
+
+    <section class="tabpanel active" id="tab-chat" role="tabpanel" aria-labelledby="tabBtnChat">
+      <div class="messages" id="messages" aria-live="polite">
+        <div class="empty" id="emptyState">
+          <h1>Ask your documents anything</h1>
+          <p>Answers come only from your files, and every claim links to the passage it came from.</p>
+          <div class="starters" id="starters">
+            <button type="button" class="starter">Summarise the main points</button>
+            <button type="button" class="starter">What are the key dates or deadlines?</button>
+            <button type="button" class="starter">What rules or requirements are mentioned?</button>
+          </div>
+        </div>
+      </div>
+      <form class="composer" id="composer" autocomplete="off">
+        <textarea id="question" rows="1" maxlength="2000" placeholder="Ask a question about your documents" aria-label="Your question"></textarea>
+        <button type="button" id="stopBtn" class="btn" hidden>Stop</button>
+        <button type="submit" id="sendBtn" class="btn btn-primary">Ask</button>
+        <button type="button" id="newChatBtn" class="btn btn-quiet" title="Clear this conversation">New chat</button>
+      </form>
+    </section>
+
+    <section class="tabpanel" id="tab-eval" role="tabpanel" aria-labelledby="tabBtnEval" hidden>
+      <div class="eval-wrap">
+        <div class="eval-intro">
+          <h1>How good are the answers?</h1>
+          <p>DocuMind writes test questions from your own documents, then measures how well each search method finds the right passage and how faithful the final answers are. It needs the language model, so allow a minute or two.</p>
+        </div>
+        <div class="eval-controls">
+          <label class="field inline">
+            <span>Test questions</span>
+            <input id="evalN" type="number" min="3" max="25" value="8">
+          </label>
+          <button id="runEval" class="btn btn-primary" type="button">Run evaluation</button>
+        </div>
+        <div id="evalProgress" class="progress" hidden>
+          <div class="bar"><div id="evalBar"></div></div>
+          <p id="evalStage" class="muted small" role="status"></p>
+        </div>
+        <div id="evalResults"></div>
+      </div>
+    </section>
+  </main>
+</div>
+<div id="toasts" class="toasts" aria-live="assertive"></div>
+<script src="/static/js/app.js" defer></script>
+</body>
+</html>
